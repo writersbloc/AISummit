@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Two Quick Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;800&display=swap">
+<style>
+/* Layout: projectable live poll. Green band header, presenter bar for the owner, two question cards with live bars, plus a no-device "Count hands" mode. */
+:root {
+  --nova-gold: #C99700;
+  --nova-green: #046A38;
+  --nova-black: #101820;
+  --bg: #C99700;
+  --card: #ffffff;
+  --ink: #101820;
+  --muted: #65665C;
+  --line: #c9cbc6;
+  --field-line: #808285;
+  --field: #f8f8f6;
+  --band: #046A38;
+  --band-ink: #ffffff;
+  --gold: #C99700;
+  --me: #500778;
+  --me-soft: #efe4f5;
+  --me-ink: #ffffff;
+  --bar: #046A38;
+  --bar-track: #e8eae6;
+  --font: "Franklin Gothic", "Libre Franklin", Arial, Helvetica, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #2b2309; --card: #18222b; --ink: #ecede9; --muted: #a9aaa2; --line: #36414b; --field-line: #6c7884; --field: #121b23;
+    --band: #034f2a; --me: #c39be0; --me-soft: #3a2347; --me-ink: #1a0a24; --bar: #5fbf8a; --bar-track: #26313a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #2b2309; --card: #18222b; --ink: #ecede9; --muted: #a9aaa2; --line: #36414b; --field-line: #6c7884; --field: #121b23;
+  --band: #034f2a; --me: #c39be0; --me-soft: #3a2347; --me-ink: #1a0a24; --bar: #5fbf8a; --bar-track: #26313a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--band); }
+.wrap { max-width: 860px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.band { background: var(--band); color: var(--band-ink); border-bottom: 4px solid var(--gold); box-shadow: 0 5px 0 var(--me); margin-bottom: 5px; }
+.band .wrap { padding-block: 26px 26px; display: grid; gap: 8px; }
+h1 { font-weight: 800; font-size: clamp(30px, 6vw, 44px); line-height: 1.05; margin: 0; text-transform: uppercase; letter-spacing: .01em; text-wrap: balance; }
+.band p { margin: 0; max-width: 62ch; font-size: 16px; }
+
+.modes { display: flex; gap: 0; }
+.modes button { background: transparent; color: var(--me); border: 1px solid var(--me); }
+.modes button + button { border-left: 0; }
+.modes button[aria-pressed="true"] { background: var(--me); color: var(--me-ink); }
+
+main { padding-block: 22px 48px; display: grid; gap: 18px; }
+.presenter { background: var(--card); border: 2px solid var(--me); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.presenter .lab { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--me); margin-right: auto; }
+.notice { background: var(--card); border: 1px solid var(--line); padding: 12px 16px; font-size: 15px; }
+
+.qcard { background: var(--card); border: 1px solid var(--line); }
+.qhead { padding: 18px 22px 12px; border-bottom: 1px solid var(--line); display: grid; gap: 2px; }
+.qhead .num { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--me); }
+.qhead h2 { margin: 0; font-size: clamp(20px, 3.4vw, 26px); font-weight: 800; line-height: 1.25; text-wrap: balance; }
+.qbody { padding: 16px 22px 20px; display: grid; gap: 10px; }
+.opt { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.opt button.choice {
+  width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: var(--field); color: var(--ink); border: 1px solid var(--field-line); font-weight: 500;
+}
+.opt button.choice[aria-pressed="true"] { background: var(--me-soft); border-color: var(--me); font-weight: 700; }
+.opt button.choice[aria-pressed="true"]::before { content: "\2713"; margin-right: 6px; color: var(--me); }
+.opt button.choice .t { flex: 1; min-width: 0; }
+.opt button.choice .c { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.track { height: 10px; background: var(--bar-track); border-radius: 2px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--bar); transition: width .5s ease; }
+.tally { display: flex; align-items: center; gap: 8px; }
+.tally .name { flex: 1; min-width: 0; font-weight: 500; }
+.tally .c { font-variant-numeric: tabular-nums; font-weight: 800; min-width: 2.5ch; text-align: center; font-size: 20px; }
+.tally button { width: 40px; height: 40px; padding: 0; font-size: 20px; line-height: 1; }
+.qfoot { font-size: 14px; color: var(--muted); }
+
+button { font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: 2px; padding: 10px 16px; border: 1px solid var(--me); background: var(--me); color: var(--me-ink); }
+button.ghost { background: transparent; color: var(--me); }
+button.quiet { background: transparent; border-color: var(--field-line); color: var(--muted); font-weight: 500; }
+button:focus-visible { outline: 3px solid var(--me); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 520px) { .qhead { padding: 16px 16px 10px; } .qbody { padding: 14px 16px 16px; } }
+@media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+</style>
+
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <h1>Two Quick Questions</h1>
+    <p>Tap one answer for each question. You can change your answer until we move on.</p>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="presenter" id="presenter" hidden>
+    <span class="lab" id="presLab">Presenter controls</span>
+    <div class="modes" role="group" aria-label="Poll mode">
+      <button type="button" id="modeLive" aria-pressed="true">Live poll</button>
+      <button type="button" id="modeHands" aria-pressed="false">Count hands</button>
+    </div>
+    <button type="button" id="revealBtn">Show results</button>
+    <span id="resetWrap"><button type="button" class="quiet" id="resetBtn">Clear all votes</button></span>
+  </div>
+  <div class="notice" id="notice" hidden aria-live="polite"></div>
+  <div id="questions"></div>
+</main>
+<script>
+// Paste your Apps Script web app URL between the quotes.
+const API_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+const QUESTIONS = [
+  { id: "q1", title: "How much have you used AI tools in your work?",
+    options: ["Not yet", "A few times, mostly out of curiosity", "Regularly, for small tasks like emails or summaries", "I've built something with one"] },
+  { id: "q2", title: "Which AI tool do you reach for first?",
+    options: ["Microsoft Copilot", "ChatGPT", "Google Gemini", "Claude", "Something else", "I don't have one yet"] }
+];
+
+const connected = /^https:\/\/script\.google\.com\//.test(API_URL);
+const KEY = new URLSearchParams(location.search).get("presenter") || "";
+let isOwner = false;
+let mode = "live";
+let counts = { q1: [], q2: [] }, total = 0, mine = {}, reveal = false;
+let hands = {};
+let busy = false;
+const HKEY = "two-questions-hands";
+
+function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+try { hands = JSON.parse(load(HKEY) || "{}") || {}; } catch (e) { hands = {}; }
+let token = load("two-questions-device");
+if (!token) { token = "d" + Math.random().toString(36).slice(2) + Date.now().toString(36); store("two-questions-device", token); }
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function notice(t) { const el = document.getElementById("notice"); el.textContent = t || ""; el.hidden = !t; }
+
+async function api(action, extra) {
+  const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(Object.assign({ action, token, key: KEY }, extra || {})) });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.message || "Request failed");
+  apply(data);
+  return data;
+}
+
+function apply(d) {
+  counts = d.counts || counts; total = d.total || 0; reveal = !!d.reveal;
+  if (d.mine) mine = d.mine;
+  if (d.presenter && !isOwner) { isOwner = true; startPolling(); }
+  render();
+}
+
+function countFor(q) {
+  if (mode === "hands") return q.options.map((_, i) => (hands[q.id] && hands[q.id][i]) || 0);
+  return q.options.map((_, i) => (counts[q.id] && counts[q.id][i]) || 0);
+}
+
+function render() {
+  const showResults = mode === "hands" || reveal || isOwner;
+  let html = "";
+  QUESTIONS.forEach((q, qi) => {
+    const n = countFor(q), sum = n.reduce((a, b) => a + b, 0), max = Math.max(1, ...n);
+    html += `<section class="qcard" aria-labelledby="h_${q.id}"><div class="qhead"><span class="num">Question ${qi + 1} of ${QUESTIONS.length}</span><h2 id="h_${q.id}">${esc(q.title)}</h2></div><div class="qbody">`;
+    q.options.forEach((o, i) => {
+      const pct = sum ? Math.round(n[i] / sum * 100) : 0;
+      const w = showResults ? (n[i] / max * 100) : 0;
+      if (mode === "hands") {
+        html += `<div class="opt"><div class="tally"><span class="name">${esc(o)}</span>
+          <button type="button" class="quiet" data-h="${q.id}" data-i="${i}" data-d="-1" aria-label="Remove one from ${esc(o)}">−</button>
+          <span class="c" aria-live="polite">${n[i]}</span>
+          <button type="button" data-h="${q.id}" data-i="${i}" data-d="1" aria-label="Add one to ${esc(o)}">+</button></div>
+          <div class="track" aria-hidden="true"><div class="fill" style="width:${w}%"></div></div></div>`;
+      } else {
+        const sel = mine[q.id] === i;
+        html += `<div class="opt"><button type="button" class="choice" data-q="${q.id}" data-i="${i}" aria-pressed="${sel}"><span class="t">${esc(o)}</span>${showResults ? `<span class="c">${n[i]}${sum ? ` · ${pct}%` : ""}</span>` : ""}</button>
+          ${showResults ? `<div class="track" aria-hidden="true"><div class="fill" style="width:${w}%"></div></div>` : ""}</div>`;
+      }
+    });
+    const foot = mode === "hands" ? `${sum} hands counted.` : showResults ? `${sum} ${sum === 1 ? "response" : "responses"} so far.` : "Results will appear when the presenter shows them.";
+    html += `<div class="qfoot">${foot}</div></div></section>`;
+  });
+  document.getElementById("questions").innerHTML = html;
+  const presenterView = isOwner || (!connected && KEY);
+  document.getElementById("presenter").hidden = !presenterView;
+  document.getElementById("revealBtn").hidden = mode !== "live" || !connected;
+  document.getElementById("resetWrap").hidden = mode !== "live" || !connected;
+  document.getElementById("presLab").textContent = mode === "live" && connected ? `Presenter controls · ${total} ${total === 1 ? "person has" : "people have"} answered` : "Presenter controls";
+  document.getElementById("revealBtn").textContent = reveal ? "Hide results" : "Show results";
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById("modeLive").setAttribute("aria-pressed", m === "live");
+  document.getElementById("modeHands").setAttribute("aria-pressed", m === "hands");
+  if (m === "hands") notice("Count hands works without anyone else opening this page. Read each answer aloud and tap + for every hand you see.");
+  else if (!connected) notice("This poll isn't connected to its Google Sheet yet, so live voting is off.");
+  else notice("");
+  render();
+}
+
+document.getElementById("modeLive").addEventListener("click", () => setMode("live"));
+document.getElementById("modeHands").addEventListener("click", () => setMode("hands"));
+
+document.getElementById("questions").addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.h) {
+    const q = b.dataset.h, i = +b.dataset.i;
+    hands[q] = hands[q] || [];
+    hands[q][i] = Math.max(0, (hands[q][i] || 0) + (+b.dataset.d));
+    store(HKEY, JSON.stringify(hands));
+    render(); return;
+  }
+  if (b.dataset.q) {
+    if (!connected) { notice("Live voting isn't connected yet."); return; }
+    mine = Object.assign({}, mine, { [b.dataset.q]: +b.dataset.i });
+    render();
+    try { await api("vote", { q: b.dataset.q, i: +b.dataset.i }); notice(""); }
+    catch (err) { notice("Your answer didn't save. Check your connection and tap it again."); }
+  }
+});
+
+document.getElementById("revealBtn").addEventListener("click", async () => {
+  try { await api("reveal", { value: !reveal }); } catch (e) { notice("The results setting didn't save. Try again in a moment."); }
+});
+
+const resetWrap = document.getElementById("resetWrap");
+resetWrap.addEventListener("click", async e => {
+  if (e.target.id === "resetBtn") {
+    resetWrap.innerHTML = `<button type="button" class="ghost" id="resetYes">Clear every vote</button> <button type="button" class="quiet" id="resetNo">Keep them</button>`;
+  } else if (e.target.id === "resetNo" || e.target.id === "resetYes") {
+    const yes = e.target.id === "resetYes";
+    resetWrap.innerHTML = `<button type="button" class="quiet" id="resetBtn">Clear all votes</button>`;
+    if (yes) {
+      try { await api("reset"); mine = {}; render(); notice("All votes are cleared."); }
+      catch (err) { notice("The votes couldn't be cleared. Try again in a moment."); }
+    }
+  }
+});
+
+let timer = null;
+async function refresh() {
+  if (busy || document.hidden || !connected) return;
+  busy = true;
+  try { await api("state"); } catch (e) {} finally { busy = false; }
+}
+function startPolling() {
+  clearInterval(timer);
+  timer = setInterval(refresh, isOwner ? 3000 : 5000);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+
+render();
+setMode("live");
+if (connected) { refresh(); startPolling(); }
+</script>
+</body>
+</html>
