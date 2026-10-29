@@ -54,7 +54,12 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 
 nav.steps { position: sticky; top: 0; z-index: 5; background: var(--card); border-bottom: 1px solid var(--line); }
-nav.steps .wrap { display: flex; gap: 2px; padding-block: 8px; overflow-x: auto; scrollbar-width: none; }
+nav.steps .navrow { max-width: 1040px; display: flex; align-items: center; gap: 10px; padding-block: 8px; }
+nav.steps .navlinks { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; min-width: 0; }
+.navdl { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 6px 12px; background: var(--card); color: var(--me); border: 1px solid var(--me); border-radius: 999px; }
+.navdl:hover { background: var(--me-soft); }
+.navdl.done { background: var(--me-soft); }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 nav.steps a { flex: 0 0 auto; text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 6px 10px; border-radius: 3px; white-space: nowrap; }
 nav.steps a .n { font-variant-numeric: tabular-nums; margin-right: 4px; }
 nav.steps a:hover { background: var(--rule); color: var(--ink); }
@@ -108,12 +113,9 @@ button.quiet { background: transparent; border-color: var(--field-line); color: 
 .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .note { font-size: 14px; color: var(--muted); min-height: 1.4em; }
 
-.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
 .pager .btn { min-width: 9rem; text-align: center; }
 .pager .btn.ghost, .pager button.ghost { background: var(--card); }
-.dlrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; padding-top: 6px; }
-.dlrow button { background: var(--card); }
-.dlrow .note { color: var(--on-bg); font-weight: 500; }
 
 .examples { display: grid; gap: 14px; }
 .ex { border: 1px solid var(--line); background: var(--field); padding: 16px 18px; display: grid; gap: 8px; }
@@ -168,7 +170,8 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 </header>
 
 <nav class="steps" aria-label="Workshop pages">
-  <div class="wrap" id="stepnav"></div>
+  <div class="wrap navrow"><div class="navlinks" id="stepnav"></div><button type="button" class="navdl" id="navDl" hidden><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="navDlText">Download</span></button></div>
+  <span class="vh" id="dlStatus" aria-live="polite"></span>
 </nav>
 
 <main class="wrap" id="main">
@@ -179,7 +182,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
     <div class="card-head"><span class="eyebrow">Page 1 of 8</span><h1 id="h-welcome">Welcome</h1></div>
     <div class="card-body">
       <p>This page goes with today’s workshop. Move through it with me during the session, and come back to it afterward to keep working. Each step builds on the one before it, so your Wish List answers turn into a prompt you can use.</p>
-      <p>Everything you type here saves in this browser on this device. I can’t see it, and nobody else can either. If you wish to switch devices, use the “Download my work” button at the bottom of the pages that follow to take your work with you.</p>
+      <p>Everything you type here saves in this browser on this device. I can’t see it, and nobody else can either. If you wish to switch devices, use the Download button at the top right of the pages that follow to take your work with you.</p>
       <div class="actions" id="pollRow">
         <a class="btn" id="pollLink" href="#" target="_blank" rel="noopener">Answer the welcome poll</a>
       </div>
@@ -459,7 +462,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
   </div>
 </section>
 
-<div class="wrap" style="padding:0;display:grid;gap:8px"><nav class="pager" aria-label="Previous and next page" id="pager"></nav><div class="dlrow" id="dlRow"><button type="button" class="ghost" id="pagerDl">Download my work</button><span class="note" id="pagerNote" aria-live="polite"></span></div></div>
+<div class="wrap" style="padding:0"><nav class="pager" aria-label="Previous and next page" id="pager"></nav></div>
 </main>
 
 
@@ -722,7 +725,14 @@ function download(note) {
   note.textContent = "Downloaded wish-list-to-prototype.txt.";
 }
 document.getElementById("dlBtn").addEventListener("click", () => download(document.getElementById("dlBtn").parentElement.querySelector(".note")));
-document.getElementById("pagerDl").addEventListener("click", () => download(document.getElementById("pagerNote")));
+let dlTimer;
+document.getElementById("navDl").addEventListener("click", () => {
+  const status = document.getElementById("dlStatus"), btn = document.getElementById("navDl"), label = document.getElementById("navDlText");
+  download(status);
+  label.textContent = /^Downloaded/.test(status.textContent) ? "Downloaded" : "Nothing yet";
+  btn.classList.add("done"); clearTimeout(dlTimer);
+  dlTimer = setTimeout(() => { label.textContent = "Download"; btn.classList.remove("done"); }, 2500);
+});
 const resetRow = document.getElementById("resetRow");
 resetRow.addEventListener("click", e => {
   if (e.target.id === "resetBtn") {
@@ -745,8 +755,7 @@ function show() {
   document.getElementById("pager").innerHTML =
     (prev ? `<a class="btn ghost" href="#${prev.id}">← ${esc(prev.dataset.title)}</a>` : "<span></span>") +
     (next ? `<a class="btn" href="#${next.id}">${esc(next.dataset.title)} →</a>` : "");
-  document.getElementById("pagerNote").textContent = "";
-  document.getElementById("dlRow").hidden = !next || i === 0;
+  document.getElementById("navDl").hidden = i === 0;
   document.title = STEPS[i].dataset.title + " · Wish List to Working Prototype";
   if (STEPS[i].id === "prompt" && !S.b) fillBuilder();
   if (STEPS[i].id === "borrow") fillBorrow();
