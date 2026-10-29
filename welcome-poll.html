@@ -88,6 +88,10 @@ button { font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; bord
 button.ghost { background: transparent; color: var(--me); }
 button.quiet { background: transparent; border-color: var(--field-line); color: var(--muted); font-weight: 500; }
 button:focus-visible { outline: 3px solid var(--me); outline-offset: 2px; }
+.onward { background: var(--card); border: 1px solid var(--line); padding: 16px 22px; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+.onward p { margin: 0; flex: 1 1 18rem; font-size: 16px; }
+.go { font-weight: 600; font-size: 16px; text-decoration: none; border-radius: 2px; padding: 10px 16px; background: var(--band); color: var(--band-ink); border: 1px solid var(--band); }
+.go:focus-visible { outline: 3px solid var(--me); outline-offset: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 520px) { .qhead { padding: 16px 16px 10px; } .qbody { padding: 14px 16px 16px; } }
 @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
@@ -114,6 +118,7 @@ button:focus-visible { outline: 3px solid var(--me); outline-offset: 2px; }
   </div>
   <div class="notice" id="notice" hidden aria-live="polite"></div>
   <div id="questions"></div>
+  <div class="onward"><p>Once you’ve answered, head to the workshop page. That’s where we’ll work for the rest of the hour.</p><a class="go" href="workshop.html">Go to the workshop page →</a></div>
 </main>
 <script>
 // Paste your Apps Script web app URL between the quotes.
