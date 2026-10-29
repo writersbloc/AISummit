@@ -56,9 +56,10 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 nav.steps { position: sticky; top: 0; z-index: 5; background: var(--card); border-bottom: 1px solid var(--line); }
 nav.steps .navrow { max-width: 1040px; display: flex; align-items: center; gap: 10px; padding-block: 8px; }
 nav.steps .navlinks { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; min-width: 0; }
-.navdl { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 6px 12px; background: var(--card); color: var(--me); border: 1px solid var(--me); border-radius: 999px; }
-.navdl:hover { background: var(--me-soft); }
+.navdl, .pill { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; padding: 6px 12px; background: var(--card); color: var(--me); border: 1px solid var(--me); border-radius: 999px; }
+.navdl:hover, .pill:hover { background: var(--me-soft); }
 .navdl.done { background: var(--me-soft); }
+.pill svg { flex: 0 0 auto; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 nav.steps a { flex: 0 0 auto; text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 6px 10px; border-radius: 3px; white-space: nowrap; }
 nav.steps a .n { font-variant-numeric: tabular-nums; margin-right: 4px; }
@@ -454,7 +455,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
       <pre class="out" id="allOut"></pre>
       <div class="actions">
         <button type="button" data-copy="allOut">Copy everything</button>
-        <button type="button" class="ghost" id="dlBtn">Download as a text file</button>
+        <button type="button" class="pill" id="dlBtn" data-icon="dl">Download</button>
         <span class="note" aria-live="polite"></span>
       </div>
       <div class="actions" id="resetRow"><button type="button" class="quiet" id="resetBtn">Start over</button></div>
@@ -522,7 +523,7 @@ document.getElementById("compareRows").innerHTML = QUESTIONS.map((q, i) => `<tr>
   <td class="c"><input type="checkbox" data-cq="A${i}" aria-label="First tool: ${esc(q)}"></td>
   <td class="c"><input type="checkbox" data-cq="B${i}" aria-label="Second tool: ${esc(q)}"></td></tr>`).join("");
 document.getElementById("moves").innerHTML = MOVES.map(([t, why, tpl], i) => `<div class="move"><h3>${esc(t)}</h3><p class="muted small">${esc(why)}</p>
-  <div class="tpl" id="move${i}">${esc(tpl)}</div><div class="actions"><button type="button" class="ghost" data-copy="move${i}">Copy this sentence</button><span class="note" aria-live="polite"></span></div></div>`).join("");
+  <div class="tpl" id="move${i}">${esc(tpl)}</div><div class="actions"><button type="button" data-copy="move${i}">Copy this sentence</button><span class="note" aria-live="polite"></span></div></div>`).join("");
 
 if (POLL_URL) document.getElementById("pollLink").href = POLL_URL; else document.getElementById("pollRow").hidden = true;
 if (TIMELINE_URL) document.getElementById("timelineLink").href = TIMELINE_URL; else document.getElementById("timelineLinks").hidden = true;
@@ -741,6 +742,16 @@ resetRow.addEventListener("click", e => {
     if (e.target.id === "resetYes") { S = { a: {}, b: null, more: "", lim: { one: true, phone: true, a11y: true, ask: true }, c: {} }; try { localStorage.removeItem(KEY); } catch (err) {} fillAll(); }
     resetRow.innerHTML = `<button type="button" class="quiet" id="resetBtn">Start over</button>`;
   }
+});
+
+/* --- button icons --- */
+const ICONS = {
+  dl: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  copy: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H4A1.5 1.5 0 0 0 2.5 3.5V9A1.5 1.5 0 0 0 4 10.5h1.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
+};
+document.querySelectorAll("[data-copy], [data-icon]").forEach(b => {
+  b.classList.add("pill");
+  b.insertAdjacentHTML("afterbegin", ICONS[b.dataset.icon || "copy"]);
 });
 
 /* --- step routing --- */
