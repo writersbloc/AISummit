@@ -137,6 +137,13 @@ pre.out { white-space: pre-wrap; font-family: var(--font); font-size: 14px; line
 .compare td.c { text-align: center; width: 6.5rem; }
 .compare td.c input { width: 20px; height: 20px; accent-color: var(--me); }
 .compare tfoot td { font-weight: 800; }
+.picks { display: grid; gap: 12px; }
+.pick { border: 1px solid var(--line); background: var(--field); padding: 16px 18px; display: grid; gap: 8px; justify-items: start; }
+.pick.on { border: 2px solid var(--me); background: var(--me-soft); }
+.pick .course { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--me); }
+.pick p { margin: 0; max-width: 64ch; }
+.pick button.ghost { background: var(--card); }
+button:disabled { opacity: .5; cursor: not-allowed; }
 .move { border-top: 1px dashed var(--rule); padding-top: 14px; display: grid; gap: 8px; }
 .move:first-child { border-top: 0; padding-top: 0; }
 .tpl { font-size: 15px; background: var(--field); border-left: 3px solid var(--me); padding: 10px 14px; }
@@ -199,7 +206,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 </section>
 
 <!-- 2 WISH LIST -->
-<section class="step" id="wishlist" data-title="Wish List" aria-labelledby="h-wish" hidden>
+<section class="step" id="wishlist" data-title="Wishlist" aria-labelledby="h-wish" hidden>
   <div class="card">
     <div class="card-head"><span class="eyebrow">Page 2 of 8</span><h1 id="h-wish">The Wish List</h1></div>
     <div class="card-body">
@@ -333,7 +340,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 </section>
 
 <!-- 5 RUN AND COMPARE -->
-<section class="step" id="compare" data-title="Run and compare" aria-labelledby="h-compare" hidden>
+<section class="step" id="compare" data-title="Run" aria-labelledby="h-compare" hidden>
   <div class="card">
     <div class="card-head"><span class="eyebrow">Page 5 of 8</span><h1 id="h-compare">Run it and compare</h1></div>
     <div class="card-body">
@@ -392,22 +399,38 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 </section>
 
 <!-- 7 MY WISH IS YOUR COMMAND -->
-<section class="step" id="borrow" data-title="Borrow a build" aria-labelledby="h-borrow" hidden>
+<section class="step" id="borrow" data-title="Borrow" aria-labelledby="h-borrow" hidden>
   <div class="card">
     <div class="card-head"><span class="eyebrow">Page 7 of 8</span><h1 id="h-borrow">My Wish Is Your Command</h1></div>
     <div class="card-body">
-      <p>If you haven’t settled on your own idea yet, or you want a second one, start from one of mine. Each prompt below describes how one of my examples works, then asks for a version that fits your work.</p>
-      <p>Fill in the three blanks once and they appear in every prompt. Anything you leave blank stays in brackets, so you can fill it in after you paste.</p>
+      <p>If you haven’t settled on your own idea yet, or you want a second one, start from one of mine. Read the five builds, pick one to riff on, make it yours, and I’ll put the prompt together.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="eyebrow">Step 1</span><h2>Pick one to riff on</h2></div>
+    <div class="card-body"><div class="picks" id="picks" role="radiogroup" aria-label="Builds to riff on"></div></div>
+  </div>
+  <div class="card" id="customCard">
+    <div class="card-head"><span class="eyebrow">Step 2</span><h2>Make it yours</h2><p class="muted small" id="customNote" style="margin:0">Pick a build first. Anything you leave blank stays in brackets, so you can fill it in after you paste.</p></div>
+    <div class="card-body">
       <div class="q"><label class="lab" for="w_who">Who will use it?</label><input type="text" id="w_who" data-w="who" placeholder="e.g. students in my evening ENG 111 section, or new students meeting with an advisor"></div>
       <div class="q"><label class="lab" for="w_topic">What subject or task is it about?</label><input type="text" id="w_topic" data-w="topic" placeholder="e.g. integrating quotations, or choosing transfer courses"></div>
       <div class="q"><label class="lab" for="w_avoid">What do your current materials get wrong?</label><input type="text" id="w_avoid" data-w="avoid" placeholder="From your Wish List, if you filled it in"></div>
+      <div class="q" id="extraQ" hidden><label class="lab" for="w_extra" id="extraLab"></label><textarea id="w_extra" data-w="extra"></textarea></div>
     </div>
   </div>
-  <div id="borrowCards" style="display:grid;gap:18px"></div>
+  <div class="card">
+    <div class="card-head"><span class="eyebrow">Step 3</span><h2>Build your prompt</h2></div>
+    <div class="card-body">
+      <pre class="out" id="borrowOut"></pre>
+      <div class="actions"><button type="button" data-copy="borrowOut" id="borrowCopy">Copy my prompt</button><span class="note" aria-live="polite"></span></div>
+      <p class="muted small">Paste it into any of the tools on the Run page.</p>
+    </div>
+  </div>
 </section>
 
 <!-- 8 KEEP GOING -->
-<section class="step" id="next" data-title="Keep going" aria-labelledby="h-next" hidden>
+<section class="step" id="next" data-title="Reflect" aria-labelledby="h-next" hidden>
   <div class="card">
     <div class="card-head"><span class="eyebrow">Page 8 of 8</span><h1 id="h-next">Keep going</h1></div>
     <div class="card-body">
@@ -578,40 +601,68 @@ function renderCompare() {
 }
 
 
-/* --- borrow a build --- */
+/* --- borrow --- */
 const BUILDS = [
   { id: "exigence", title: "The Exigence Outpost", course: "ENG 111 · a story game",
-    text: (w) => `Build me a short, story-based practice game like this one. A recurring character in a small fictional village faces a series of situations, and the player helps them respond. The game moves through short rounds: first the player sorts facts about a situation into categories, then decides which problems can and can’t be solved with the right response, and finally chooses the best way to respond to a specific moment. Every choice gets immediate feedback that explains why it works or doesn’t, in plain and friendly language. Keep a running score and give the characters distinct personalities.\n\nBut make it for ${w.who}, about ${w.topic}. Make sure it avoids this problem with my current materials: ${w.avoid}` },
+    summary: "A short story game. A recurring character in a fictional village faces a series of situations. Players sort facts, decide which problems words can solve, and choose a response, with feedback on every choice.",
+    body: "Build me a short, story-based practice game. A recurring character in a small fictional village faces a series of situations, and the player helps them respond. The game moves through short rounds: first the player sorts facts about a situation into categories, then decides which problems can and can’t be solved with the right response, and finally chooses the best way to respond to a specific moment. Every choice gets immediate feedback that explains why it works or doesn’t, in plain and friendly language. Keep a running score and give the characters distinct personalities." },
   { id: "search", title: "Last Search Standing", course: "ENG 111 · a printed game, adapted",
-    text: (w) => `Help me adapt a game I already use in class into my own version, in two forms. Here is the game I start from: [describe the game or activity you already use].\n\nFirst, make a printable kit for teams of three or four: a facilitator guide with a timed schedule, a one-page How to Play sheet, a team log, and cards to cut out. Give each team member a job. Second, make a web version one person can play alone, with computer opponents, so students can keep practicing outside of class. In both versions, every round should add one new challenge, and a team is out when its work stops meeting the standard. End with debrief questions.\n\nBut make it for ${w.who}, about ${w.topic}. Make sure it avoids this problem with my current materials: ${w.avoid}` },
+    summary: "A game you already use, rebuilt as your own. One version is a printable kit for teams, with jobs, cards, and a facilitator guide. The other is a web version one person can play alone, outside class.",
+    extra: { label: "What game or activity do you already use?", ph: "e.g. a card game from a colleague, a review game, a sorting activity you do on the whiteboard", bracket: "[describe the game or activity you already use]" },
+    body: "Help me adapt a game I already use in class into my own version, in two forms. Here is the game I start from: {extra}\n\nFirst, make a printable kit for teams of three or four: a facilitator guide with a timed schedule, a one-page How to Play sheet, a team log, and cards to cut out. Give each team member a job. Second, make a web version one person can play alone, with computer opponents, so people can keep practicing on their own. In both versions, every round should add one new challenge, and a team is out when its work stops meeting the standard. End with debrief questions." },
   { id: "citing", title: "Citing and annotating sources", course: "ENG 111 · a self-guided practice page",
-    text: (w) => `Build me a self-guided practice page that walks people through a skill in about six short steps. Start with a worked example everyone does on the same shared material, with a model answer they can check against. Next, show a few common traps using made-up examples. Then have them apply the skill to their own material. Include a checker that gives specific feedback on what’s missing or out of order, not just right or wrong. Unlock the self-check only after they write a first draft. Save their work in the browser as they type, and finish with a step that collects everything so they can copy it into their submission.\n\nBut make it for ${w.who}, about ${w.topic}. Make sure it avoids this problem with my current materials: ${w.avoid}` },
+    summary: "A self-guided page in about six steps. Everyone practices on one shared example first, then on their own material, with a checker that gives specific feedback and a final step that collects their work.",
+    body: "Build me a self-guided practice page that walks people through a skill in about six short steps. Start with a worked example everyone does on the same shared material, with a model answer they can check against. Next, show a few common traps using made-up examples. Then have them apply the skill to their own material. Include a checker that gives specific feedback on what’s missing or out of order, not just right or wrong. Unlock the self-check only after they write a first draft. Save their work in the browser as they type, and finish with a step that collects everything so they can copy it into their submission." },
   { id: "timeline", title: "Scrolling timeline", course: "ENG 230 · a visual timeline",
-    text: (w) => `Build me a horizontal scrolling timeline. Above the line, place the items people will work with, in the order they were created or first appeared. Below the line, place the events and milestones that shaped them, in the order they happened. Color-code each kind of item and include a short key. Each entry gets a date, a title, and one line of description. Note that spacing is sequential, not to scale. Use inline styles only, so it can be pasted into a Canvas page.\n\nBut make it for ${w.who}, about ${w.topic}. Here are the items and dates to include: [paste your list]. Make sure it avoids this problem with my current materials: ${w.avoid}` },
+    summary: "A horizontal timeline people scroll sideways. What they’ll work with sits above the line, and the events that shaped it sit below, color-coded, with a key.",
+    extra: { label: "What items and dates should it include?", ph: "e.g. each reading with its publication year, plus three or four events that shaped the field", bracket: "[paste your list of items and dates]" },
+    body: "Build me a horizontal scrolling timeline. Above the line, place the items people will work with, in the order they were created or first appeared. Below the line, place the events and milestones that shaped them, in the order they happened. Color-code each kind of item and include a short key. Each entry gets a date, a title, and one line of description. Note that spacing is sequential, not to scale. Use inline styles only, so it can be pasted into a Canvas page.\n\nHere are the items and dates to include: {extra}" },
   { id: "branding", title: "Course branding and theme", course: "ENG 230 · a style sheet and template",
-    text: (w) => `Help me give my course or office materials one consistent look and voice. First, make a one-page brand guide: a palette of five or six colors with hex codes, an accessible tint for any color that’s hard to read, two typefaces and what each is for, a short motto, and themed names for the things I hand out again and again. Then build one reusable page template in that style that I can copy for each new page. Check every text and background pair for WCAG AA contrast.\n\nBut make it for ${w.who}, about ${w.topic}, with a theme of [a theme that fits your course or office]. Make sure it avoids this problem with my current materials: ${w.avoid}` }
+    summary: "One look and voice for everything you hand out. A one-page brand guide with colors, typefaces, a motto, and themed names, plus a page template you can copy.",
+    extra: { label: "What theme fits your course or office?", ph: "e.g. a detective’s case file, a field station, a travel guide", bracket: "[a theme that fits your course or office]" },
+    body: "Help me give my materials one consistent look and voice, with a theme of {extra} First, make a one-page brand guide: a palette of five or six colors with hex codes, an accessible tint for any color that’s hard to read, two typefaces and what each is for, a short motto, and themed names for the things I hand out again and again. Then build one reusable page template in that style that I can copy for each new page. Check every text and background pair for WCAG AA contrast." }
 ];
-const BUILD_END = "\n\nMake it a single HTML file that works on a phone and meets WCAG AA. Before you build it, tell me your plan and ask me anything you need to know.";
-function wvals() {
+const BUILD_END = "Make it a single HTML file that works on a phone and meets WCAG AA. Before you build it, tell me your plan and ask me anything you need to know.";
+function clean(v) { return (v || "").trim(); }
+function sentence(v) { v = clean(v); return v && !/[.!?]$/.test(v) ? v + "." : v; }
+function borrowPrompt() {
+  const b = BUILDS.find(x => x.id === (S.w && S.w.pick));
+  if (!b) return "";
   const w = S.w || {};
-  const f = (v, ph) => { v = (v || "").trim(); return v ? v.replace(/[.!?]+$/, "") : ph; };
-  let avoid = (w.avoid !== undefined ? w.avoid : (S.a.gap_bad || "")).trim();
-  avoid = avoid ? (/[.!?]$/.test(avoid) ? avoid : avoid + ".") : "[what your current materials get wrong].";
-  return { who: f(w.who, "[who will use it]"), topic: f(w.topic, "[your subject or task]"), avoid };
+  const who = clean(w.who).replace(/[.!?]+$/, "") || "[who will use it]";
+  const topic = clean(w.topic).replace(/[.!?]+$/, "") || "[your subject or task]";
+  const avoid = sentence(w.avoid !== undefined ? w.avoid : (S.a.gap_bad || "")) || "[what your current materials get wrong].";
+  const extra = b.extra ? (sentence((w.extras || {})[b.id]) || b.extra.bracket + (b.id === "branding" ? "." : "")) : "";
+  const body = b.body.replace("{extra}", extra);
+  return body + "\n\nMake it for " + who + ", about " + topic + ". Make sure it avoids this problem with my current materials: " + avoid + "\n\n" + BUILD_END;
+}
+function renderPicks() {
+  const pick = S.w && S.w.pick;
+  document.getElementById("picks").innerHTML = BUILDS.map(b => `<div class="pick${b.id === pick ? " on" : ""}">
+    <span class="course">${esc(b.course)}</span><h3>${esc(b.title)}</h3><p>${esc(b.summary)}</p>
+    <button type="button" class="${b.id === pick ? "" : "ghost"}" role="radio" aria-checked="${b.id === pick}" data-pick="${b.id}">${b.id === pick ? "\u2713 Riffing on this one" : "Riff on this one"}</button></div>`).join("");
 }
 function renderBorrow() {
-  const w = wvals();
-  document.getElementById("borrowCards").innerHTML = BUILDS.map(b => `<div class="card">
-    <div class="card-head"><span class="eyebrow">${esc(b.course)}</span><h2>${esc(b.title)}</h2></div>
-    <div class="card-body"><pre class="out" id="bp_${b.id}">${esc(b.text(w) + BUILD_END)}</pre>
-    <div class="actions"><button type="button" data-copy="bp_${b.id}">Build me something like this</button><span class="note" aria-live="polite"></span></div></div></div>`).join("");
+  const b = BUILDS.find(x => x.id === (S.w && S.w.pick));
+  const q = document.getElementById("extraQ");
+  if (b && b.extra) {
+    q.hidden = false;
+    document.getElementById("extraLab").textContent = b.extra.label;
+    const ta = document.getElementById("w_extra");
+    ta.placeholder = b.extra.ph;
+    if (document.activeElement !== ta) { ta.value = ((S.w.extras || {})[b.id]) || ""; grow(ta); }
+  } else q.hidden = true;
+  document.getElementById("customNote").textContent = b ? "You’re riffing on " + b.title + ". Anything you leave blank stays in brackets, so you can fill it in after you paste." : "Pick a build first. Anything you leave blank stays in brackets, so you can fill it in after you paste.";
+  const t = borrowPrompt();
+  document.getElementById("borrowOut").textContent = t || "Pick a build in step 1 and your prompt will appear here.";
+  document.getElementById("borrowCopy").disabled = !t;
 }
 function fillBorrow() {
   const w = S.w || {};
   document.getElementById("w_who").value = w.who || "";
   document.getElementById("w_topic").value = w.topic || "";
   document.getElementById("w_avoid").value = w.avoid !== undefined ? w.avoid : (S.a.gap_bad || "");
-  renderBorrow();
+  renderPicks(); renderBorrow();
 }
 function fillAll() {
   document.querySelectorAll("[data-k]").forEach(el => el.value = S.a[el.dataset.k] || "");
@@ -630,6 +681,7 @@ main.addEventListener("input", e => {
   else if (el.dataset.b) { collectBuilder(); renderPrompt(); }
   else if (el.id === "b_more") { S.more = el.value; renderPrompt(); }
   else if (el.dataset.c) S.c[el.dataset.c] = el.value;
+  else if (el.dataset.w === "extra") { S.w = S.w || {}; S.w.extras = S.w.extras || {}; if (S.w.pick) S.w.extras[S.w.pick] = el.value; renderBorrow(); }
   else if (el.dataset.w) { S.w = S.w || {}; S.w[el.dataset.w] = el.value; renderBorrow(); }
   else return;
   renderAll(); save();
@@ -646,6 +698,12 @@ main.addEventListener("change", e => {
 document.getElementById("refill").addEventListener("click", () => {
   S.b = null; fillBuilder(); renderAll(); save(); growAll();
   document.getElementById("refillNote").textContent = "Filled in from your Wish List.";
+});
+main.addEventListener("click", e => {
+  const p = e.target.closest("[data-pick]"); if (!p) return;
+  S.w = S.w || {}; S.w.pick = p.dataset.pick; renderPicks(); renderBorrow(); save();
+  const c = document.getElementById("customCard"); if (c) c.scrollIntoView({ block: "start" });
+  setTimeout(() => document.getElementById("w_who").focus({ preventScroll: true }), 300);
 });
 main.addEventListener("click", e => {
   const b = e.target.closest("[data-copy]"); if (!b) return;
