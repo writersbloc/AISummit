@@ -68,7 +68,7 @@ nav.steps a[aria-current="page"] { background: var(--me); color: var(--me-ink); 
 
 main { padding-block: 24px 56px; }
 .step { display: grid; gap: 18px; }
-.card { background: var(--card); border: 1px solid var(--line); }
+.card { background: var(--card); border: 1px solid var(--line); scroll-margin-top: 64px; }
 .card-head { padding: 20px 24px 14px; border-bottom: 1px solid var(--rule); display: grid; gap: 4px; }
 .card-head .eyebrow { color: var(--me); }
 h1, h2 { margin: 0; font-weight: 800; text-wrap: balance; }
@@ -95,7 +95,7 @@ textarea::placeholder, input::placeholder { color: var(--muted); opacity: 1; fon
 textarea:focus, input:focus, button:focus-visible, a:focus-visible, .chip:focus-within, .tick:focus-within { outline: 2px solid var(--me); outline-offset: 2px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-h1[tabindex="-1"]:focus { outline: none; }
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .chip { position: relative; }
 .chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .chip span { display: inline-block; font-size: 14px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--field-line); background: var(--field); color: var(--ink); cursor: pointer; }
@@ -140,6 +140,16 @@ pre.out { white-space: pre-wrap; font-family: var(--font); font-size: 14px; line
 .compare td.c { text-align: center; width: 6.5rem; }
 .compare td.c input { width: 20px; height: 20px; accent-color: var(--me); }
 .compare tfoot td { font-weight: 800; }
+.opt-btn { font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--field-line); background: var(--field); color: var(--ink); }
+.opt-btn[aria-pressed="true"] { background: var(--me-soft); border-color: var(--me); font-weight: 600; }
+.opt-btn[aria-pressed="true"]::before { content: "\2713\00a0"; }
+.rec { border-left: 3px solid var(--me); background: var(--me-soft); padding: 12px 16px; }
+.rec:empty { display: none; }
+.rec p { margin: 0; }
+.card-body p a, .card-body li a { color: var(--me); font-weight: 600; }
+.card.picked { border: 2px solid var(--me); }
+.badge { display: inline-block; margin-left: 8px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--me); color: var(--me-ink); vertical-align: middle; }
+.card-body h3 { margin-top: 6px; }
 .picks { display: grid; gap: 12px; }
 .pick { border: 1px solid var(--line); background: var(--field); padding: 16px 18px; display: grid; gap: 8px; justify-items: start; }
 .pick.on { border: 2px solid var(--me); background: var(--me-soft); }
@@ -180,10 +190,10 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 <!-- 1 WELCOME -->
 <section class="step" id="welcome" data-title="Welcome" aria-labelledby="h-welcome">
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 1 of 8</span><h1 id="h-welcome">Welcome</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 1 of 9</span><h1 id="h-welcome">Welcome</h1></div>
     <div class="card-body">
-      <p>This page goes with today’s workshop. Move through it with me during the session, and come back to it afterward to keep working. Each step builds on the one before it, so your Wish List answers turn into a prompt you can use.</p>
-      <p>Everything you type here saves in this browser on this device. I can’t see it, and nobody else can either. If you wish to switch devices, use the Download button at the top right of the pages that follow to take your work with you.</p>
+      <p>This page goes with today’s workshop. Move through it with me during the session. Each step builds on the one before it, so your Wish List answers turn into a prompt you can use.</p>
+      <p>What you type here stays on your device. I can’t see it, and nobody else can either. That also means nothing is stored anywhere else, so closing this window, using a private window, or clearing your browser can erase your work. Use the Download button at the top right of the pages that follow to keep a copy, and download before you close the window.</p>
       <div class="actions" id="pollRow">
         <a class="btn" id="pollLink" href="#" target="_blank" rel="noopener">Answer the welcome poll</a>
       </div>
@@ -204,6 +214,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
         <li>Turn your Wish List into a prompt.</li>
         <li>Compare what different tools do with the same prompt.</li>
         <li>Revise once, which is where a draft becomes a prototype.</li>
+        <li>Put it where people will use it, on Canvas or a Google Site.</li>
       </ol>
     </div>
   </div>
@@ -212,7 +223,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 <!-- 2 WISH LIST -->
 <section class="step" id="wishlist" data-title="Wishlist" aria-labelledby="h-wish" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 2 of 8</span><h1 id="h-wish">The Wish List</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 2 of 9</span><h1 id="h-wish">The Wish List</h1></div>
     <div class="card-body">
       <p>Set aside what’s practical for a few minutes. These prompts ask what the people you work with need from the materials you give them and where those materials fall short. If you teach, think about your students. If you work in advising, the library, tutoring, or another office, think about the students or colleagues who come to you.</p>
     </div>
@@ -249,7 +260,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 <!-- 3 EXAMPLES -->
 <section class="step" id="examples" data-title="Examples" aria-labelledby="h-ex" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 3 of 8</span><h1 id="h-ex">Five examples and how they were made</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 3 of 9</span><h1 id="h-ex">Five examples and how they were made</h1></div>
     <div class="card-body">
       <p>Each of these started as a wish. Open any of them and try it the way a student would.</p>
       <div class="examples">
@@ -307,7 +318,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 <!-- 4 PROMPT -->
 <section class="step" id="prompt" data-title="Prompt" aria-labelledby="h-prompt" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 4 of 8</span><h1 id="h-prompt">Your Wish List is already a prompt</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 4 of 9</span><h1 id="h-prompt">Your Wish List is already a prompt</h1></div>
     <div class="card-body">
       <p>Each part of a strong prompt matches something you already wrote. The builder below fills itself in from your Wish List. Change anything you like; your edits here won’t change your Wish List.</p>
       <div class="actions"><button type="button" class="ghost" id="refill">Fill in again from my Wish List</button><span class="note" id="refillNote" aria-live="polite"></span></div>
@@ -346,7 +357,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 <!-- 5 RUN AND COMPARE -->
 <section class="step" id="compare" data-title="Run" aria-labelledby="h-compare" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 5 of 8</span><h1 id="h-compare">Run it and compare</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 5 of 9</span><h1 id="h-compare">Run it and compare</h1></div>
     <div class="card-body">
       <p>Paste your prompt into whatever tool you have, and answer the questions it asks you. If you have time, try the same prompt in a second tool.</p>
     </div>
@@ -392,7 +403,7 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
 <!-- 6 REVISE -->
 <section class="step" id="revise" data-title="Revise" aria-labelledby="h-revise" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 6 of 8</span><h1 id="h-revise">Pick one move and revise once</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 6 of 9</span><h1 id="h-revise">Pick one move and revise once</h1></div>
     <div class="card-body">
       <p>The first draft is rarely the one you keep. Pick one of these moves, copy its sentence, and fill in the brackets.</p>
     </div>
@@ -402,10 +413,75 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
   </div>
 </section>
 
-<!-- 7 MY WISH IS YOUR COMMAND -->
+<!-- 7 DEPLOY -->
+<section class="step" id="deploy" data-title="Deploy" aria-labelledby="h-deploy" hidden>
+  <div class="card">
+    <div class="card-head"><span class="eyebrow">Page 7 of 9</span><h1 id="h-deploy">Put it where people will use it</h1></div>
+    <div class="card-body">
+      <p>A prototype only helps once people can open it. The two easiest homes are a Canvas page and a Google Site. Jump to the one you want.</p>
+      <div class="actions"><a class="btn ghost" href="#dCanvas" data-jump="dCanvas">A Canvas page</a><a class="btn ghost" href="#dSites" data-jump="dSites">A Google Site</a></div>
+    </div>
+  </div>
+  <div class="card" id="dCanvas">
+    <div class="card-head"><span class="eyebrow">Option 1</span><h2>A Canvas page</h2><p class="muted small" style="margin:0">Best for content students read or scroll in one course: a styled page, a timeline, a branded module page.</p></div>
+    <div class="card-body">
+      <p><b>Know this first:</b> Canvas removes &lt;style&gt; and &lt;script&gt; blocks from pages. Styling has to sit inside each tag, and anything that responds to clicks or typing won’t run. If your build is interactive, put it on a Google Site and link to it from Canvas.</p>
+      <h3>1. Ask the tool to prepare it for Canvas</h3>
+      <pre class="out" id="canvasPrompt">Rewrite this so I can paste it into a Canvas page. Canvas removes style and script blocks, so put every style inline on each element, and use no JavaScript. Use only HTML that Canvas allows: headings, paragraphs, lists, tables, images, links, and divs. Keep the same look as closely as you can, and keep text and background colors at WCAG AA contrast. Give me only the HTML for the body of the page, with no html, head, or body tags.</pre>
+      <div class="actions"><button type="button" data-copy="canvasPrompt">Copy this request</button><span class="note" aria-live="polite"></span></div>
+      <h3>2. Paste it into Canvas</h3>
+      <ol>
+        <li>In your course, open <b>Pages</b> and click <b>+ Page</b>, or open an existing page and click <b>Edit</b>.</li>
+        <li>Click the <b>&lt;/&gt;</b> icon at the bottom right of the editor to switch to the HTML editor.</li>
+        <li>Paste the HTML, give the page a title, and click <b>Save</b>.</li>
+      </ol>
+      <h3>3. Check it</h3>
+      <ul>
+        <li>Open <b>Student View</b> and look at the page there.</li>
+        <li>Check it on your phone in the Canvas Student app.</li>
+        <li>If the layout broke, switch back to the HTML editor and copy the code that’s there. Paste it back into the tool and ask it to fix whatever went wrong.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" id="dSites">
+    <div class="card-head"><span class="eyebrow">Option 2</span><h2>A Google Site</h2><p class="muted small" style="margin:0">Best for anything interactive, like a game, a checker, or a practice page with feedback, and for anything people outside one course need.</p></div>
+    <div class="card-body">
+      <h3>1. Ask the tool to prepare it for Google Sites</h3>
+      <pre class="out" id="sitesPrompt">Make this one self-contained HTML file I can paste into a Google Sites Embed code box. Put all the CSS and JavaScript inside the file, with no other files to load except Google Fonts. It will display in a frame on the page, so make it fit narrow widths without sideways scrolling, and tell me how tall the frame should be. Keep everything accessible to WCAG AA.</pre>
+      <div class="actions"><button type="button" data-copy="sitesPrompt">Copy this request</button><span class="note" aria-live="polite"></span></div>
+      <h3>2. Build the site</h3>
+      <ol>
+        <li>Go to <a href="https://sites.google.com" target="_blank" rel="noopener">sites.google.com</a> while signed in with your VCCS Gmail account, and start a blank site.</li>
+        <li>On the right, choose <b>Insert</b>, then <b>Embed</b>, then the <b>Embed code</b> tab.</li>
+        <li>Paste the whole HTML file, click <b>Next</b>, then <b>Insert</b>.</li>
+        <li>Drag the box’s bottom edge to the height the tool suggested.</li>
+      </ol>
+      <h3>3. Decide who can see it, then publish</h3>
+      <ul>
+        <li>Click <b>Publish</b>. Under who can view it, choose the VCCS organization if it’s for students and colleagues, or <b>Anyone</b> if people outside VCCS need it.</li>
+        <li>Open the published link in a private window to see it the way others will.</li>
+        <li>Share the link in Canvas, an email, or a QR code. In Canvas, a plain link that opens in a new tab is the most reliable.</li>
+      </ul>
+      <p class="muted small">If Sites won’t save the embed because the file is too long, ask the tool to make it shorter, or split it into two pages of the site.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="eyebrow">Either way</span><h2>Before you share it</h2></div>
+    <div class="card-body">
+      <ul>
+        <li>Try it once as a student would, start to finish, on a phone and on a computer.</li>
+        <li>Tab through it with the keyboard and make sure you can reach everything.</li>
+        <li>Make sure no student names, grades, or other private information is in it.</li>
+        <li>Keep the final HTML in a file of your own, so you can revise it later or move it to the other home.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 MY WISH IS YOUR COMMAND -->
 <section class="step" id="borrow" data-title="Borrow" aria-labelledby="h-borrow" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 7 of 8</span><h1 id="h-borrow">My Wish Is Your Command</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 8 of 9</span><h1 id="h-borrow">My Wish Is Your Command</h1></div>
     <div class="card-body">
       <p>If you haven’t settled on your own idea yet, or you want a second one, start from one of mine. Read the five builds, pick one to riff on, make it yours, and I’ll put the prompt together.</p>
     </div>
@@ -433,12 +509,12 @@ footer { padding-block: 0 40px; color: var(--on-bg); font-size: 13px; font-weigh
   </div>
 </section>
 
-<!-- 8 KEEP GOING -->
+<!-- 9 KEEP GOING -->
 <section class="step" id="next" data-title="Reflect" aria-labelledby="h-next" hidden>
   <div class="card">
-    <div class="card-head"><span class="eyebrow">Page 8 of 8</span><h1 id="h-next">Keep going</h1></div>
+    <div class="card-head"><span class="eyebrow">Page 9 of 9</span><h1 id="h-next">Keep going</h1></div>
     <div class="card-body">
-      <p>Your Wish List probably has more than one idea in it. Come back to it whenever you have time. Your answers stay in this browser, and you can download everything below to keep a copy.</p>
+      <p>Your Wish List probably has more than one idea in it. Download everything below before you close this window. Your work isn’t saved anywhere else, so the file is the copy that lasts.</p>
     </div>
   </div>
   <div class="card">
@@ -505,7 +581,8 @@ const MOVES = [
   ["Ask what it needs", "When drafts keep missing, the tool can often tell you why.", "This still isn’t quite what I want. What information would help you get closer?"]
 ];
 
-let S = { a: {}, b: null, more: "", lim: { one: true, phone: true, a11y: true, ask: true }, c: {} };
+let dirty = false;
+let S = { a: {}, b: null, d: {}, more: "", lim: { one: true, phone: true, a11y: true, ask: true }, c: {} };
 function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); if (v && v.a) S = Object.assign(S, v); } catch (e) {} }
 let tSave;
 function save() { clearTimeout(tSave); tSave = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }, 300); }
@@ -688,7 +765,7 @@ main.addEventListener("input", e => {
   else if (el.dataset.w === "extra") { S.w = S.w || {}; S.w.extras = S.w.extras || {}; if (S.w.pick) S.w.extras[S.w.pick] = el.value; renderBorrow(); }
   else if (el.dataset.w) { S.w = S.w || {}; S.w[el.dataset.w] = el.value; renderBorrow(); }
   else return;
-  renderAll(); save();
+  renderAll(); save(); dirty = true;
 });
 main.addEventListener("change", e => {
   const el = e.target;
@@ -697,11 +774,18 @@ main.addEventListener("change", e => {
   else if (el.dataset.lim) { S.lim[el.dataset.lim] = el.checked; renderPrompt(); }
   else if (el.dataset.cq) { S.c[el.dataset.cq] = el.checked; renderCompare(); }
   else return;
-  renderAll(); save();
+  renderAll(); save(); dirty = true;
 });
 document.getElementById("refill").addEventListener("click", () => {
   S.b = null; fillBuilder(); renderAll(); save(); growAll();
   document.getElementById("refillNote").textContent = "Filled in from your Wish List.";
+});
+main.addEventListener("click", e => {
+  const j = e.target.closest("[data-jump]"); if (!j) return;
+  e.preventDefault();
+  const t = document.getElementById(j.dataset.jump);
+  t.scrollIntoView({ block: "start" });
+  const h = t.querySelector("h2"); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
 });
 main.addEventListener("click", e => {
   const p = e.target.closest("[data-pick]"); if (!p) return;
@@ -715,9 +799,11 @@ main.addEventListener("click", e => {
   const fallback = () => { const r = document.createRange(); r.selectNodeContents(src); const s = getSelection(); s.removeAllRanges(); s.addRange(r); if (note) note.textContent = "The text is selected. Copy it with your keyboard."; };
   try { navigator.clipboard.writeText(text).then(() => { if (note) note.textContent = "Copied."; }, fallback); } catch (err) { fallback(); }
 });
+window.addEventListener("beforeunload", e => { if (dirty && compileAll()) { e.preventDefault(); e.returnValue = ""; } });
 function download(note) {
   const text = compileAll();
   if (!text) { note.textContent = "There’s nothing to download yet."; return; }
+  dirty = false;
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
   a.download = "wish-list-to-prototype.txt";
@@ -739,7 +825,7 @@ resetRow.addEventListener("click", e => {
   if (e.target.id === "resetBtn") {
     resetRow.innerHTML = `<span>Clear everything on every page? This can’t be undone.</span><button type="button" class="ghost" id="resetYes">Yes, clear it</button><button type="button" class="quiet" id="resetNo">Keep my work</button>`;
   } else if (e.target.id === "resetYes" || e.target.id === "resetNo") {
-    if (e.target.id === "resetYes") { S = { a: {}, b: null, more: "", lim: { one: true, phone: true, a11y: true, ask: true }, c: {} }; try { localStorage.removeItem(KEY); } catch (err) {} fillAll(); }
+    if (e.target.id === "resetYes") { S = { a: {}, b: null, d: {}, more: "", lim: { one: true, phone: true, a11y: true, ask: true }, c: {} }; try { localStorage.removeItem(KEY); } catch (err) {} fillAll(); }
     resetRow.innerHTML = `<button type="button" class="quiet" id="resetBtn">Start over</button>`;
   }
 });
